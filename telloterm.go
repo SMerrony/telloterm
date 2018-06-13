@@ -53,36 +53,12 @@ type label struct {
 var staticLabels = []label{
 	label{32, 0, termbox.ColorWhite | termbox.AttrReverse, termbox.ColorDefault, "TelloTerm"},
 
-	label{8, 2, termbox.ColorWhite, termbox.ColorDefault, "Height: "},
-	label{33, 2, termbox.ColorWhite, termbox.ColorDefault, "Battery: "},
-	label{60, 2, termbox.ColorWhite, termbox.ColorDefault, "WiFi: "},
-
-	label{4, 4, termbox.ColorWhite, termbox.ColorDefault, "Max Height: "},
-	label{23, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "},
-	label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "},
-
-	label{29, 6, termbox.ColorYellow, termbox.ColorDefault, "Calc. Speed: "},
-	label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "},
-	label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "},
-	label{51, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "},
-
-	label{3, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Low: "},
-	label{24, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Critical: "},
-	label{51, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State: "},
-
-	label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual: "},
-	label{24, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature: "},
-	label{50, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength: "},
-
-	label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground: "},
-	label{32, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "},
-	label{58, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "},
-
 	label{2, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "},
 	label{42, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "},
 }
 
 type field struct {
+	lab    label
 	x, y   int
 	w      int
 	fg, bg termbox.Attribute
@@ -91,30 +67,30 @@ type field struct {
 
 var fieldsMu sync.RWMutex
 var fields = []field{
-	field{16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
-	field{42, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
-	field{66, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
+	field{label{8, 2, termbox.ColorWhite, termbox.ColorDefault, "Height: "}, 16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
+	field{label{33, 2, termbox.ColorWhite, termbox.ColorDefault, "Battery: "}, 42, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
+	field{label{60, 2, termbox.ColorWhite, termbox.ColorDefault, "WiFi: "}, 66, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
 
-	field{16, 4, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
-	field{42, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
-	field{66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
+	field{label{4, 4, termbox.ColorWhite, termbox.ColorDefault, "Max Height: "}, 16, 4, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
+	field{label{23, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "}, 42, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
+	field{label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
 
-	field{42, 6, 6, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
-	field{16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
-	field{42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
-	field{66, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
+	field{label{29, 6, termbox.ColorYellow, termbox.ColorDefault, "Calc. Speed: "}, 42, 6, 6, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
+	field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
+	field{label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
+	field{label{51, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "}, 66, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
 
-	field{16, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{42, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{66, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{3, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Low: "}, 16, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{24, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Critical: "}, 42, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{51, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State: "}, 66, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
 
-	field{16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{42, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{66, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "0"},
+	field{label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual: "}, 16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{24, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature: "}, 42, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{50, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength: "}, 66, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "0"},
 
-	field{16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{42, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{66, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground: "}, 16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{32, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "}, 42, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	field{label{58, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "}, 66, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
 }
 
 var (
@@ -305,6 +281,7 @@ func displayStaticFields() {
 func displayDataFields() {
 	fieldsMu.RLock()
 	for _, d := range fields {
+		tbprint(d.lab.x, d.lab.y, d.lab.fg, d.lab.bg, d.lab.text)
 		tbprint(d.x, d.y, d.fg, d.bg, padString(d.value, d.w))
 	}
 	fieldsMu.RUnlock()
