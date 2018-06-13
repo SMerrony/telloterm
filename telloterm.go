@@ -89,6 +89,7 @@ type field struct {
 	value  string
 }
 
+var fieldsMu sync.RWMutex
 var fields = []field{
 	field{16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
 	field{42, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
@@ -117,8 +118,8 @@ var fields = []field{
 }
 
 var (
-	drone    tello.Tello
-	fieldsMu sync.RWMutex
+	drone     tello.Tello
+	wideVideo bool
 )
 
 // program flags
@@ -187,6 +188,7 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyCtrlL:
+				termbox.Sync()
 				displayStaticFields()
 				displayDataFields()
 			case termbox.KeySpace:
@@ -204,6 +206,7 @@ mainloop:
 				case 'q':
 					break mainloop
 				case 'r':
+					termbox.Sync()
 					displayStaticFields()
 					displayDataFields()
 				case 'b':
@@ -228,14 +231,21 @@ mainloop:
 					drone.TakePicture()
 				case 'v':
 					startVideo()
-				case 1:
+				case '1':
 					drone.ForwardFlip()
-				case 2:
+				case '2':
 					drone.BackFlip()
-				case 3:
+				case '3':
 					drone.LeftFlip()
-				case 4:
+				case '4':
 					drone.RightFlip()
+				case '=':
+					if wideVideo {
+						drone.SetVideoNormal()
+					} else {
+						drone.SetVideoWide()
+					}
+					wideVideo = !wideVideo
 				}
 			}
 
@@ -264,6 +274,7 @@ f             Take Picture (Foto)
 q/<Escape>    Quit
 r/<Ctrl-L>	  Refresh Screen
 v             Start Video (mplayer) Window
+=             Switch between normal and wide video mode
 `)
 }
 
