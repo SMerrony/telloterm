@@ -65,32 +65,65 @@ type field struct {
 	value  string
 }
 
+const (
+	fHeight = iota
+	fBattery
+	fWifiStrength
+	fMaxHeight
+	fLowBattThresh
+	fWifiInterference
+	fDerivedSpeed
+	fGroundSpeed
+	fFwdSpeed
+	fLatSpeed
+	fBattLow
+	fBattCrit
+	fBattState
+	fGroundVis
+	fOvertemp
+	fLightStrength
+	fOnGround
+	fHovering
+	fFlying
+	fCameraState
+	fDroneFlyTimeLeft
+	fDroneBattLeft
+	fNumFields
+)
+
 var fieldsMu sync.RWMutex
-var fields = []field{
-	field{label{8, 2, termbox.ColorWhite, termbox.ColorDefault, "Height: "}, 16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
-	field{label{33, 2, termbox.ColorWhite, termbox.ColorDefault, "Battery: "}, 42, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
-	field{label{60, 2, termbox.ColorWhite, termbox.ColorDefault, "WiFi: "}, 66, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
+var fields [fNumFields]field
 
-	field{label{4, 4, termbox.ColorWhite, termbox.ColorDefault, "Max Height: "}, 16, 4, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"},
-	field{label{23, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "}, 42, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
-	field{label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"},
+func setupFields() {
+	fields[fHeight] = field{label{8, 2, termbox.ColorWhite, termbox.ColorDefault, "Height: "}, 16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"}
+	fields[fBattery] = field{label{33, 2, termbox.ColorWhite, termbox.ColorDefault, "Battery: "}, 42, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
+	fields[fWifiStrength] = field{label{60, 2, termbox.ColorWhite, termbox.ColorDefault, "WiFi: "}, 66, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
 
-	field{label{29, 6, termbox.ColorYellow, termbox.ColorDefault, "Calc. Speed: "}, 42, 6, 6, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
-	field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
-	field{label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
-	field{label{51, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "}, 66, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"},
+	fields[fMaxHeight] = field{label{4, 4, termbox.ColorWhite, termbox.ColorDefault, "Max Height: "}, 16, 4, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"}
+	fields[fLowBattThresh] = field{label{23, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "}, 42, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
+	fields[fWifiInterference] = field{label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
 
-	field{label{3, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Low: "}, 16, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{label{24, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Critical: "}, 42, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{label{51, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State: "}, 66, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	fields[fDerivedSpeed] = field{label{27, 6, termbox.ColorYellow, termbox.ColorDefault, "Derived Speed: "}, 42, 6, 6, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fGroundSpeed] = field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fFwdSpeed] = field{label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fLatSpeed] = field{label{51, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "}, 66, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
 
-	field{label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual: "}, 16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{label{24, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature: "}, 42, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{label{50, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength: "}, 66, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "0"},
+	fields[fBattLow] = field{label{3, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Low: "}, 16, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fBattCrit] = field{label{24, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Critical: "}, 42, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fBattState] = field{label{51, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State: "}, 66, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
 
-	field{label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground: "}, 16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{label{32, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "}, 42, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
-	field{label{58, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "}, 66, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"},
+	fields[fGroundVis] = field{label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual: "}, 16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fOvertemp] = field{label{24, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature: "}, 42, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fLightStrength] = field{label{50, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength: "}, 66, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "0"}
+
+	fields[fOnGround] = field{label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground: "}, 16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fHovering] = field{label{32, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "}, 42, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fFlying] = field{label{58, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "}, 66, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+
+	fields[fCameraState] = field{label{2, 12, termbox.ColorWhite, termbox.ColorDefault, "Camera State:"}, 16, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fDroneFlyTimeLeft] = field{label{32, 12, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fDroneBattLeft] = field{label{58, 12, termbox.ColorWhite, termbox.ColorDefault, "Drone Batt:"}, 66, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
 }
 
 var (
@@ -119,6 +152,8 @@ func main() {
 
 	//w, h := checkTermSize()
 	checkTermSize()
+
+	setupFields()
 
 	displayStaticFields()
 
@@ -301,30 +336,35 @@ func boolToYN(b bool) string {
 }
 
 func updateFields(newFd tello.FlightData) {
-	fields[0].value = fmt.Sprintf("%.1fm", float32(newFd.Height)/10)
-	fields[1].value = fmt.Sprintf("%d%%", newFd.BatteryPercentage)
-	fields[2].value = fmt.Sprintf("%d%%", newFd.WifiStrength)
+	fields[fHeight].value = fmt.Sprintf("%.1fm", float32(newFd.Height)/10)
+	fields[fBattery].value = fmt.Sprintf("%d%%", newFd.BatteryPercentage)
+	fields[fWifiStrength].value = fmt.Sprintf("%d%%", newFd.WifiStrength)
 
-	fields[3].value = fmt.Sprintf("%dm", newFd.MaxHeight)
-	fields[4].value = fmt.Sprintf("%d%%", newFd.LowBatteryThreshold)
-	fields[5].value = fmt.Sprintf("%d%%", newFd.WifiInterference)
+	fields[fMaxHeight].value = fmt.Sprintf("%dm", newFd.MaxHeight)
+	fields[fLowBattThresh].value = fmt.Sprintf("%d%%", newFd.LowBatteryThreshold)
+	fields[fWifiInterference].value = fmt.Sprintf("%d%%", newFd.WifiInterference)
 
-	fields[6].value = fmt.Sprintf("%.1fm/s", math.Sqrt(float64(newFd.NorthSpeed*newFd.NorthSpeed)+float64(newFd.EastSpeed*newFd.EastSpeed)))
-	fields[7].value = fmt.Sprintf("%dm/s", newFd.GroundSpeed)
-	fields[8].value = fmt.Sprintf("%dm/s", newFd.NorthSpeed)
-	fields[9].value = fmt.Sprintf("%dm/s", newFd.EastSpeed)
+	fields[fDerivedSpeed].value = fmt.Sprintf("%.1fm/s", math.Sqrt(float64(newFd.NorthSpeed*newFd.NorthSpeed)+float64(newFd.EastSpeed*newFd.EastSpeed)))
+	fields[fGroundSpeed].value = fmt.Sprintf("%dm/s", newFd.GroundSpeed)
+	fields[fFwdSpeed].value = fmt.Sprintf("%dm/s", newFd.NorthSpeed)
+	fields[fLatSpeed].value = fmt.Sprintf("%dm/s", newFd.EastSpeed)
 
-	fields[10].value = boolToYN(newFd.BatteryLow)
-	fields[11].value = boolToYN(newFd.BatteryCritical)
-	fields[12].value = boolToYN(newFd.BatteryState)
+	fields[fBattLow].value = boolToYN(newFd.BatteryLow)
+	fields[fBattCrit].value = boolToYN(newFd.BatteryCritical)
+	fields[fBattState].value = boolToYN(newFd.BatteryState)
 
-	fields[13].value = boolToYN(newFd.DownVisualState)
-	fields[14].value = boolToYN(newFd.OverTemp)
-	fields[15].value = fmt.Sprintf("%d", newFd.LightStrength)
+	fields[fGroundVis].value = boolToYN(newFd.DownVisualState)
+	fields[fOvertemp].value = boolToYN(newFd.OverTemp)
+	fields[fLightStrength].value = fmt.Sprintf("%d", newFd.LightStrength)
 
-	fields[16].value = boolToYN(newFd.OnGround)
-	fields[17].value = boolToYN(newFd.DroneHover)
-	fields[18].value = boolToYN(newFd.Flying)
+	fields[fOnGround].value = boolToYN(newFd.OnGround)
+	fields[fHovering].value = boolToYN(newFd.DroneHover)
+	fields[fFlying].value = boolToYN(newFd.Flying)
+
+	fields[fCameraState].value = fmt.Sprintf("%d", newFd.CameraState)
+	fields[fDroneFlyTimeLeft].value = fmt.Sprintf("%d", newFd.DroneFlyTimeLeft)
+	fields[fDroneBattLeft].value = fmt.Sprintf("%dmV", newFd.BatteryMilliVolts)
+
 }
 
 func startVideo() {
