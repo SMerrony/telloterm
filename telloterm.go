@@ -135,14 +135,20 @@ func setupFields() {
 }
 
 var (
-	drone     tello.Tello
-	wideVideo bool
+	drone       tello.Tello
+	wideVideo   bool
+	useJoystick bool
+	stickChan   chan<- tello.StickMessage
 )
 
 // program flags
 var (
-	x11Flag = flag.Bool("x11", false, "Use '-vo x11' flag in case mplayer takes over entire window")
-	//joyHelpFlag = flag.Bool("joyhelp", false, "Print help for joystick control mapping and exit")
+	x11Flag     = flag.Bool("x11", false, "Use '-vo x11' flag in case mplayer takes over entire window")
+	jsListFlag  = flag.Bool("jslist", false, "List attached joysticks")
+	jsIDFlag    = flag.Int("jsid", 999, "ID number of joystick to use (see -jslist to get IDs)")
+	jsTypeFlag  = flag.String("jstype", "", "Type of joystick, options are DualShock4, HotasX")
+	jsTest      = flag.Bool("jstest", false, "Debug joystick mapping")
+	joyHelpFlag = flag.Bool("joyhelp", false, "Print help for joystick control mapping and exit")
 	keyHelpFlag = flag.Bool("keyhelp", false, "Print help for keyboard control mapping and exit")
 )
 
@@ -152,17 +158,29 @@ func main() {
 		printKeyHelp()
 		os.Exit(0)
 	}
+	if *joyHelpFlag {
+		printJoystickHelp()
+		os.Exit(0)
+	}
+	if *jsListFlag {
+		listJoysticks()
+		os.Exit(0)
+	}
+	if *jsIDFlag != 999 {
+		useJoystick = setupJoystick(*jsIDFlag)
+	}
+	if *jsTest {
+		readJoystick(true)
+	}
+
 	err := termbox.Init()
 	if err != nil {
 		panic(err)
 	}
 	defer termbox.Close()
 
-	//w, h := checkTermSize()
 	checkTermSize()
-
 	setupFields()
-
 	displayStaticFields()
 
 	displayDataFields() // FIXME remove: testing
@@ -197,6 +215,11 @@ func main() {
 	drone.GetMaxHeight()
 	drone.GetSSID()
 	drone.GetVersion()
+
+	if useJoystick {
+		stickChan, _ = drone.StartStickListener()
+		go readJoystick(false)
+	}
 
 mainloop:
 	for {
