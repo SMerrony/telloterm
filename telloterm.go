@@ -51,10 +51,7 @@ type label struct {
 }
 
 var staticLabels = []label{
-	label{32, 0, termbox.ColorWhite | termbox.AttrReverse, termbox.ColorDefault, "TelloTerm"},
-
-	label{2, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "},
-	label{42, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "},
+	label{33, 0, termbox.ColorWhite | termbox.AttrReverse, termbox.ColorDefault, "TelloTerm"},
 }
 
 type field struct {
@@ -76,6 +73,7 @@ const (
 	fGroundSpeed
 	fFwdSpeed
 	fLatSpeed
+	fVertSpeed
 	fBattLow
 	fBattCrit
 	fBattState
@@ -85,9 +83,12 @@ const (
 	fOnGround
 	fHovering
 	fFlying
+	fFlyMode
 	fCameraState
 	fDroneFlyTimeLeft
 	fDroneBattLeft
+	fSSID
+	fVersion
 	fNumFields
 )
 
@@ -103,7 +104,9 @@ func setupFields() {
 	fields[fLowBattThresh] = field{label{23, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "}, 42, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
 	fields[fWifiInterference] = field{label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
 
-	fields[fDerivedSpeed] = field{label{27, 6, termbox.ColorYellow, termbox.ColorDefault, "Derived Speed: "}, 42, 6, 6, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fDerivedSpeed] = field{label{27, 6, termbox.ColorYellow, termbox.ColorDefault, "Derived Speed: "}, 42, 6, 7, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fVertSpeed] = field{label{50, 6, termbox.ColorWhite, termbox.ColorDefault, "Vertical Speed: "}, 42, 6, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+
 	fields[fGroundSpeed] = field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
 	fields[fFwdSpeed] = field{label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
 	fields[fLatSpeed] = field{label{51, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "}, 66, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
@@ -120,9 +123,14 @@ func setupFields() {
 	fields[fHovering] = field{label{32, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "}, 42, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
 	fields[fFlying] = field{label{58, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "}, 66, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
 
-	fields[fCameraState] = field{label{2, 12, termbox.ColorWhite, termbox.ColorDefault, "Camera State:"}, 16, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fDroneFlyTimeLeft] = field{label{32, 12, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fDroneBattLeft] = field{label{58, 12, termbox.ColorWhite, termbox.ColorDefault, "Drone Batt:"}, 66, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fFlyMode] = field{label{29, 12, termbox.ColorWhite, termbox.ColorDefault, "Flight Mode: "}, 42, 12, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
+	fields[fCameraState] = field{label{2, 13, termbox.ColorWhite, termbox.ColorDefault, "Camera State:"}, 16, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fDroneFlyTimeLeft] = field{label{24, 13, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fDroneBattLeft] = field{label{54, 13, termbox.ColorWhite, termbox.ColorDefault, "Drone Batt:"}, 66, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
+	fields[fSSID] = field{label{10, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "}, 16, 22, 20, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVersion] = field{label{56, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 66, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 }
 
@@ -157,8 +165,7 @@ func main() {
 
 	displayStaticFields()
 
-	// updateFields(flightData) // FIXME remove:testing
-	// displayDataFields()      // FIXME remove: testing
+	displayDataFields() // FIXME remove: testing
 
 	err = drone.ControlConnectDefault()
 	if err != nil {
@@ -250,6 +257,10 @@ mainloop:
 					drone.LeftFlip()
 				case '4':
 					drone.RightFlip()
+				case '+':
+					drone.SetFastMode()
+				case '-':
+					drone.SetSlowMode()
 				case '=':
 					if wideVideo {
 						drone.SetVideoNormal()
@@ -285,6 +296,8 @@ f             Take Picture (Foto)
 q/<Escape>    Quit
 r/<Ctrl-L>	  Refresh Screen
 v             Start Video (mplayer) Window
+-             Slow (normal) flight mode
++             Fast (sports) flight mode
 =             Switch between normal and wide video mode
 `)
 }
@@ -349,6 +362,8 @@ func updateFields(newFd tello.FlightData) {
 	fields[fFwdSpeed].value = fmt.Sprintf("%dm/s", newFd.NorthSpeed)
 	fields[fLatSpeed].value = fmt.Sprintf("%dm/s", newFd.EastSpeed)
 
+	fields[fVertSpeed].value = fmt.Sprintf("%dm/s", newFd.VerticalSpeed)
+
 	fields[fBattLow].value = boolToYN(newFd.BatteryLow)
 	fields[fBattCrit].value = boolToYN(newFd.BatteryCritical)
 	fields[fBattState].value = boolToYN(newFd.BatteryState)
@@ -361,10 +376,14 @@ func updateFields(newFd tello.FlightData) {
 	fields[fHovering].value = boolToYN(newFd.DroneHover)
 	fields[fFlying].value = boolToYN(newFd.Flying)
 
+	fields[fFlyMode].value = fmt.Sprintf("%d", newFd.FlyMode)
+
 	fields[fCameraState].value = fmt.Sprintf("%d", newFd.CameraState)
 	fields[fDroneFlyTimeLeft].value = fmt.Sprintf("%d", newFd.DroneFlyTimeLeft)
 	fields[fDroneBattLeft].value = fmt.Sprintf("%dmV", newFd.BatteryMilliVolts)
 
+	fields[fSSID].value = newFd.SSID
+	fields[fVersion].value = newFd.Version
 }
 
 func startVideo() {
