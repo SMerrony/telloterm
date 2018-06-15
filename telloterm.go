@@ -29,6 +29,7 @@ import (
 	"math"
 	"os"
 	"os/exec"
+	"runtime/pprof"
 	"strconv"
 	"sync"
 	"time"
@@ -143,13 +144,14 @@ var (
 
 // program flags
 var (
-	x11Flag     = flag.Bool("x11", false, "Use '-vo x11' flag in case mplayer takes over entire window")
-	jsListFlag  = flag.Bool("jslist", false, "List attached joysticks")
-	jsIDFlag    = flag.Int("jsid", 999, "ID number of joystick to use (see -jslist to get IDs)")
-	jsTypeFlag  = flag.String("jstype", "", "Type of joystick, options are DualShock4, HotasX")
-	jsTest      = flag.Bool("jstest", false, "Debug joystick mapping")
+	cpuprofile  = flag.String("cpuprofile", "", "Write cpu profile to `file`")
 	joyHelpFlag = flag.Bool("joyhelp", false, "Print help for joystick control mapping and exit")
+	jsIDFlag    = flag.Int("jsid", 999, "ID number of joystick to use (see -jslist to get IDs)")
+	jsListFlag  = flag.Bool("jslist", false, "List attached joysticks")
+	jsTest      = flag.Bool("jstest", false, "Debug joystick mapping")
+	jsTypeFlag  = flag.String("jstype", "", "Type of joystick, options are DualShock4, HotasX")
 	keyHelpFlag = flag.Bool("keyhelp", false, "Print help for keyboard control mapping and exit")
+	x11Flag     = flag.Bool("x11", false, "Use '-vo x11' flag in case mplayer takes over entire window")
 )
 
 func main() {
@@ -172,6 +174,16 @@ func main() {
 	if *jsTest {
 		readJoystick(true)
 	}
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 
 	err := termbox.Init()
 	if err != nil {
@@ -191,7 +203,7 @@ func main() {
 		log.Fatalf("Could not connect to Tello - %v", err)
 	}
 
-	// subscribe to FlightData events and ask for regularupdates
+	// subscribe to FlightData events and ask for regular updates
 	fdChan, _ := drone.StreamFlightData(false, updatePeriodMs)
 	go func() {
 		for {
