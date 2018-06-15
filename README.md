@@ -13,6 +13,8 @@ Telloterm currently provides
 
 Only tested on GNU/Linux - it almost certainly won't work as-is on other platforms.
 
+![Screenshot](ScreenShot.png "TelloTerm in-flight")
+
 
 ## Install
 
