@@ -25,6 +25,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"runtime"
 	"time"
 
 	"github.com/SMerrony/tello"
@@ -62,6 +63,8 @@ const (
 	btnUnknown
 )
 
+const deadZone = 2000
+
 type joystickConfig struct {
 	axes    []int
 	buttons []uint
@@ -77,6 +80,17 @@ var dualShock4Config = joystickConfig{
 	},
 }
 
+var dualShock4ConfigWin = joystickConfig{
+	axes: []int{
+		axLeftX: 0, axLeftY: 1, axRightX: 2, axRightY: 3,
+	},
+	buttons: []uint{
+		btnX: 1, btnCircle: 2, btnTriangle: 3, btnSquare: 0, btnL1: 4,
+		btnL2: 6, btnR1: 5, btnR2: 7,
+	},
+}
+
+// hotas mapping seems the same on windows and linux
 var tflightHotasXConfig = joystickConfig{
 	axes: []int{
 		axLeftX: 4, axLeftY: 2, axRightX: 0, axRightY: 1,
@@ -126,7 +140,12 @@ func setupJoystick(id int) bool {
 	}
 	switch *jsTypeFlag {
 	case "DualShock4":
-		jsConfig = dualShock4Config
+		switch runtime.GOOS {
+		case "windows":
+			jsConfig = dualShock4ConfigWin
+		default:
+			jsConfig = dualShock4Config
+		}
 	case "HotasX":
 		jsConfig = tflightHotasXConfig
 	default:
@@ -153,6 +172,16 @@ func readJoystick(test bool) {
 		sm.Ly = int16(jsState.AxisData[jsConfig.axes[axLeftY]]) * -1
 		sm.Rx = int16(jsState.AxisData[jsConfig.axes[axRightX]])
 		sm.Ry = int16(jsState.AxisData[jsConfig.axes[axRightY]]) * -1
+		switch {
+		case sm.Lx < deadZone:
+			sm.Lx = 0
+		case sm.Ly < deadZone:
+			sm.Ly = 0
+		case sm.Rx < deadZone:
+			sm.Rx = 0
+		case sm.Ry < deadZone:
+			sm.Ry = 0
+		}
 
 		if test {
 			log.Printf("JS: Lx: %d, Ly: %d, Rx: %d, Ry: %d\n", sm.Lx, sm.Ly, sm.Rx, sm.Ry)
