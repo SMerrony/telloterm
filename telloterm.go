@@ -106,7 +106,7 @@ func setupFields() {
 	fields[fWifiInterference] = field{label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
 
 	fields[fDerivedSpeed] = field{label{27, 6, termbox.ColorYellow, termbox.ColorDefault, "Derived Speed: "}, 42, 6, 7, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
-	fields[fVertSpeed] = field{label{50, 6, termbox.ColorWhite, termbox.ColorDefault, "Vertical Speed: "}, 42, 6, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fVertSpeed] = field{label{50, 6, termbox.ColorWhite, termbox.ColorDefault, "Vertical Speed: "}, 66, 6, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
 
 	fields[fGroundSpeed] = field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
 	fields[fFwdSpeed] = field{label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
@@ -128,7 +128,7 @@ func setupFields() {
 
 	fields[fCameraState] = field{label{2, 13, termbox.ColorWhite, termbox.ColorDefault, "Camera State:"}, 16, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fDroneFlyTimeLeft] = field{label{24, 13, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fDroneBattLeft] = field{label{54, 13, termbox.ColorWhite, termbox.ColorDefault, "Drone Batt:"}, 66, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fDroneBattLeft] = field{label{49, 13, termbox.ColorWhite, termbox.ColorDefault, "Battery Voltage:"}, 66, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fSSID] = field{label{10, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "}, 16, 22, 20, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fVersion] = field{label{56, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 66, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
