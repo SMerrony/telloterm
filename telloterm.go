@@ -88,6 +88,12 @@ const (
 	fCameraState
 	fDroneFlyTimeLeft
 	fDroneBattLeft
+	fVelX
+	fVelY
+	fVelZ
+	fPosX
+	fPosY
+	fPosZ
 	fSSID
 	fVersion
 	fNumFields
@@ -129,6 +135,14 @@ func setupFields() {
 	fields[fCameraState] = field{label{2, 13, termbox.ColorWhite, termbox.ColorDefault, "Camera State:"}, 16, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fDroneFlyTimeLeft] = field{label{24, 13, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fDroneBattLeft] = field{label{49, 13, termbox.ColorWhite, termbox.ColorDefault, "Battery Voltage:"}, 66, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
+	fields[fVelX] = field{label{4, 16, termbox.ColorWhite, termbox.ColorDefault, "X Position:"}, 16, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelY] = field{label{30, 16, termbox.ColorWhite, termbox.ColorDefault, "Y Position:"}, 42, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelZ] = field{label{54, 16, termbox.ColorWhite, termbox.ColorDefault, "Z Position:"}, 66, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
+	fields[fPosX] = field{label{4, 17, termbox.ColorWhite, termbox.ColorDefault, "X Velocity:"}, 16, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fPosY] = field{label{30, 17, termbox.ColorWhite, termbox.ColorDefault, "Y Velocity:"}, 42, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fPosZ] = field{label{54, 17, termbox.ColorWhite, termbox.ColorDefault, "Z Velocity:"}, 66, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fSSID] = field{label{10, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "}, 16, 22, 20, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fVersion] = field{label{56, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 66, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
@@ -416,6 +430,14 @@ func updateFields(newFd tello.FlightData) {
 	fields[fCameraState].value = fmt.Sprintf("%d", newFd.CameraState)
 	fields[fDroneFlyTimeLeft].value = fmt.Sprintf("%d", newFd.DroneFlyTimeLeft)
 	fields[fDroneBattLeft].value = fmt.Sprintf("%dmV", newFd.BatteryMilliVolts)
+
+	fields[fVelX].value = fmt.Sprintf("%d", newFd.VelocityX)
+	fields[fVelY].value = fmt.Sprintf("%d", newFd.VelocityY)
+	fields[fVelZ].value = fmt.Sprintf("%d", newFd.VelocityZ)
+
+	fields[fPosX].value = fmt.Sprintf("%f", newFd.PositionX)
+	fields[fPosY].value = fmt.Sprintf("%f", newFd.PositionY)
+	fields[fPosZ].value = fmt.Sprintf("%f", newFd.PositionZ)
 
 	fields[fSSID].value = newFd.SSID
 	fields[fVersion].value = newFd.Version
