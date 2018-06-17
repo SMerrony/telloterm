@@ -1,5 +1,5 @@
 # telloterm
-A functioning desktop testbed for flying the Ryze Tello drone via my tello API.
+A functioning desktop testbed written in Go for flying the Ryze Tello drone via my tello package.
 
 _Play with this entirely at your own risk - it's not the author's fault if you lose your drone
 or damage it, or anything else, when using this software._
@@ -11,7 +11,7 @@ Telloterm currently provides
 * optional live video feed via mplayer (must be installed separately)
 * optional control via a Dualshock 4 game controller or Thrustmaster HotasX flight controller
 
-Only tested on GNU/Linux - it almost certainly won't work as-is on other platforms.
+Only tested on GNU/Linux - it wil probably work OK on Macs, but it will take some effort to get it running on Windows.
 
 ![Screenshot](ScreenShot.png "TelloTerm in-flight")
 
@@ -27,9 +27,11 @@ If you wish to use the video window you must have mplayer installed and on your 
 * Turn on the Tello
 * Wait for it to initialise (flashing orange LED)
 * Connect your computer to the Tello WiFi
-* Run telloterm from a terminal window
+* Run telloterm from a terminal window at least 80x24 characters big 
 
-Hit 'v' to start a video feed, an mplayer window should appear. 
+Hit 'v' to start a video feed, an mplayer window should appear in a couple of seconds.
+
+If the screen gets messed up, hit `r` or `<Ctrl-L>` to redraw it.
 
 To get help type `telloterm -h`
 
