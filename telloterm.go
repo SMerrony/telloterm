@@ -95,6 +95,11 @@ const (
 	fPosX
 	fPosY
 	fPosZ
+	fQatW
+	fQatX
+	fQatY
+	fQatZ
+	fTemp
 	fSSID
 	fVersion
 	fNumFields
@@ -137,13 +142,20 @@ func setupFields() {
 	fields[fDroneFlyTimeLeft] = field{label{24, 13, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fDroneBattLeft] = field{label{49, 13, termbox.ColorWhite, termbox.ColorDefault, "Battery Voltage:"}, 66, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fVelX] = field{label{4, 16, termbox.ColorWhite, termbox.ColorDefault, "X Velocity:"}, 16, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fVelY] = field{label{30, 16, termbox.ColorWhite, termbox.ColorDefault, "Y Velocity:"}, 42, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fVelZ] = field{label{54, 16, termbox.ColorWhite, termbox.ColorDefault, "Z Velocity:"}, 66, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelX] = field{label{4, 16, termbox.ColorWhite, termbox.ColorDefault, "X Velocity:"}, 16, 16, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelY] = field{label{30, 16, termbox.ColorWhite, termbox.ColorDefault, "Y Velocity:"}, 42, 16, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelZ] = field{label{54, 16, termbox.ColorWhite, termbox.ColorDefault, "Z Velocity:"}, 66, 16, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fPosX] = field{label{4, 17, termbox.ColorWhite, termbox.ColorDefault, "X Position:"}, 16, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fPosY] = field{label{30, 17, termbox.ColorWhite, termbox.ColorDefault, "Y Position:"}, 42, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fPosZ] = field{label{54, 17, termbox.ColorWhite, termbox.ColorDefault, "Z Position:"}, 66, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
+	fields[fQatX] = field{label{4, 18, termbox.ColorWhite, termbox.ColorDefault, "X Quat:"}, 16, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatY] = field{label{30, 18, termbox.ColorWhite, termbox.ColorDefault, "Y Quat:"}, 42, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatZ] = field{label{54, 18, termbox.ColorWhite, termbox.ColorDefault, "Z Quat:"}, 66, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+
+	fields[fTemp] = field{label{4, 19, termbox.ColorWhite, termbox.ColorDefault, "Temp:"}, 16, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatW] = field{label{30, 19, termbox.ColorWhite, termbox.ColorDefault, "W Quat:"}, 42, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fSSID] = field{label{10, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "}, 16, 22, 20, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fVersion] = field{label{56, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 66, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
@@ -432,13 +444,19 @@ func updateFields(newFd tello.FlightData) {
 	fields[fDroneFlyTimeLeft].value = fmt.Sprintf("%d", newFd.DroneFlyTimeLeft)
 	fields[fDroneBattLeft].value = fmt.Sprintf("%dmV", newFd.BatteryMilliVolts)
 
-	fields[fVelX].value = fmt.Sprintf("%d", newFd.VelocityX)
-	fields[fVelY].value = fmt.Sprintf("%d", newFd.VelocityY)
-	fields[fVelZ].value = fmt.Sprintf("%d", newFd.VelocityZ)
+	fields[fVelX].value = fmt.Sprintf("%dcm/s", newFd.MVO.VelocityX)
+	fields[fVelY].value = fmt.Sprintf("%dcm/s", newFd.MVO.VelocityY)
+	fields[fVelZ].value = fmt.Sprintf("%dcm/s", newFd.MVO.VelocityZ)
 
-	fields[fPosX].value = fmt.Sprintf("%f", newFd.PositionX)
-	fields[fPosY].value = fmt.Sprintf("%f", newFd.PositionY)
-	fields[fPosZ].value = fmt.Sprintf("%f", newFd.PositionZ)
+	fields[fPosX].value = fmt.Sprintf("%f", newFd.MVO.PositionX)
+	fields[fPosY].value = fmt.Sprintf("%f", newFd.MVO.PositionY)
+	fields[fPosZ].value = fmt.Sprintf("%f", newFd.MVO.PositionZ)
+
+	fields[fQatW].value = fmt.Sprintf("%f", newFd.IMU.QuaternionW)
+	fields[fQatX].value = fmt.Sprintf("%f", newFd.IMU.QuaternionX)
+	fields[fQatY].value = fmt.Sprintf("%f", newFd.IMU.QuaternionY)
+	fields[fQatZ].value = fmt.Sprintf("%f", newFd.IMU.QuaternionZ)
+	fields[fTemp].value = fmt.Sprintf("%dC", newFd.IMU.Temperature)
 
 	fields[fSSID].value = newFd.SSID
 	fields[fVersion].value = newFd.Version
