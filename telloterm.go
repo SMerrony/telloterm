@@ -311,6 +311,8 @@ mainloop:
 					drone.TakePicture()
 				case 'v':
 					startVideo()
+				case '0':
+					drone.StartSmartVideo(tello.Sv360)
 				case '1':
 					drone.ForwardFlip()
 				case '2':
@@ -353,6 +355,7 @@ t             Takeoff
 o             Throw Takeoff
 l             Land
 p             Palm Land
+0             360 degree smart video flight
 1|2|3|4       Flip Fwd/Back/Left/Right
 f             Take Picture (Foto)
 q/<Escape>    Quit
