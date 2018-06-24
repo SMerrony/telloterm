@@ -159,10 +159,11 @@ func setupFields() {
 
 	fields[fTemp] = field{label{4, 19, termbox.ColorWhite, termbox.ColorDefault, "Temp:"}, 16, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fQatW] = field{label{30, 19, termbox.ColorWhite, termbox.ColorDefault, "W Quat:"}, 42, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fYaw] = field{label{54, 19, termbox.ColorWhite, termbox.ColorDefault, "Yaw:"}, 66, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fRoll] = field{label{4, 20, termbox.ColorWhite, termbox.ColorDefault, "Roll:"}, 16, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fPitch] = field{label{30, 20, termbox.ColorWhite, termbox.ColorDefault, "Pitch:"}, 42, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fYaw] = field{label{54, 20, termbox.ColorWhite, termbox.ColorDefault, "Yaw:"}, 66, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	// fields[fRoll] = field{label{4, 20, termbox.ColorWhite, termbox.ColorDefault, "Roll:"}, 16, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	// fields[fPitch] = field{label{30, 20, termbox.ColorWhite, termbox.ColorDefault, "Pitch:"}, 42, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	// fields[fYaw] = field{label{54, 20, termbox.ColorWhite, termbox.ColorDefault, "Yaw:"}, 66, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fSSID] = field{label{10, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "}, 16, 22, 20, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fVersion] = field{label{56, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 66, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
@@ -468,10 +469,10 @@ func updateFields(newFd tello.FlightData) {
 	fields[fQatZ].value = fmt.Sprintf("%f", newFd.IMU.QuaternionZ)
 	fields[fTemp].value = fmt.Sprintf("%dC", newFd.IMU.Temperature)
 
-	p, r, y := tello.QuatToEulerDeg(float64(newFd.IMU.QuaternionX), float64(newFd.IMU.QuaternionY), float64(newFd.IMU.QuaternionZ), float64(newFd.IMU.QuaternionW))
-	fields[fRoll].value = fmt.Sprintf("%d", r)
-	fields[fPitch].value = fmt.Sprintf("%d", p)
-	fields[fYaw].value = fmt.Sprintf("%d", y)
+	// p, r, y := tello.QuatToEulerDeg(newFd.IMU.QuaternionX, newFd.IMU.QuaternionY, newFd.IMU.QuaternionZ, newFd.IMU.QuaternionW)
+	// fields[fRoll].value = fmt.Sprintf("%d", r)
+	// fields[fPitch].value = fmt.Sprintf("%d", p)
+	fields[fYaw].value = fmt.Sprintf("%d", newFd.IMU.Yaw)
 
 	fields[fSSID].value = newFd.SSID
 	fields[fVersion].value = newFd.Version
