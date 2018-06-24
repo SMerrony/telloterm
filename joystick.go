@@ -154,6 +154,13 @@ func setupJoystick(id int) bool {
 	return true
 }
 
+func intAbs(x int16) int16 {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 func readJoystick(test bool) {
 	var (
 		sm                 tello.StickMessage
@@ -172,14 +179,16 @@ func readJoystick(test bool) {
 		sm.Ly = int16(jsState.AxisData[jsConfig.axes[axLeftY]]) * -1
 		sm.Rx = int16(jsState.AxisData[jsConfig.axes[axRightX]])
 		sm.Ry = int16(jsState.AxisData[jsConfig.axes[axRightY]]) * -1
-		switch {
-		case sm.Lx < deadZone:
+		if intAbs(sm.Lx) < deadZone {
 			sm.Lx = 0
-		case sm.Ly < deadZone:
+		}
+		if intAbs(sm.Ly) < deadZone {
 			sm.Ly = 0
-		case sm.Rx < deadZone:
+		}
+		if intAbs(sm.Rx) < deadZone {
 			sm.Rx = 0
-		case sm.Ry < deadZone:
+		}
+		if intAbs(sm.Ry) < deadZone {
 			sm.Ry = 0
 		}
 
