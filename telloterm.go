@@ -23,6 +23,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"log"
@@ -172,6 +173,8 @@ func setupFields() {
 
 var (
 	drone       tello.Tello
+	fdLogging   bool
+	fdLog       *csv.Writer
 	wideVideo   bool
 	useJoystick bool
 	stickChan   chan<- tello.StickMessage
@@ -180,6 +183,7 @@ var (
 // program flags
 var (
 	cpuprofile  = flag.String("cpuprofile", "", "Write cpu profile to `file`")
+	fdLogFlag   = flag.String("fdlog", "", "Log some CSV flight data to this file")
 	joyHelpFlag = flag.Bool("joyhelp", false, "Print help for joystick control mapping and exit")
 	jsIDFlag    = flag.Int("jsid", 999, "ID number of joystick to use (see -jslist to get IDs)")
 	jsListFlag  = flag.Bool("jslist", false, "List attached joysticks")
@@ -218,6 +222,21 @@ func main() {
 			log.Fatal("could not start CPU profile: ", err)
 		}
 		defer pprof.StopCPUProfile()
+	}
+	if *fdLogFlag != "" {
+		fdlogFile, err := os.Create(*fdLogFlag)
+		if err != nil {
+			log.Fatal("Cannot create Flight Log file: ", err)
+		}
+		defer fdlogFile.Close()
+		fdLog = csv.NewWriter(fdlogFile)
+		defer fdLog.Flush()
+		headers := []string{"Time", "X", "Y", "Z", "Yaw", "FDHeight"}
+		err = fdLog.Write(headers)
+		if err != nil {
+			log.Fatal("Cannot write headers to Flight Log file: ", err)
+		}
+		fdLogging = true
 	}
 
 	err := termbox.Init()
@@ -476,6 +495,13 @@ func updateFields(newFd tello.FlightData) {
 
 	fields[fSSID].value = newFd.SSID
 	fields[fVersion].value = newFd.Version
+
+	if fdLogging {
+		logLine := []string{time.Now().Format("15:04:05.000"), fmt.Sprintf("%f", newFd.MVO.PositionX),
+			fmt.Sprintf("%f", newFd.MVO.PositionY), fmt.Sprintf("%f", newFd.MVO.PositionZ),
+			fmt.Sprintf("%d", newFd.IMU.Yaw), fmt.Sprintf("%.1f", float32(newFd.Height)/10)}
+		fdLog.Write(logLine)
+	}
 }
 
 func startVideo() {
