@@ -13,3 +13,7 @@ telloterm
 
 *.jpg
 
+*.log
+*.csv
+*.gnuneric
+
