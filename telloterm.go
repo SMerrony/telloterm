@@ -55,6 +55,8 @@ type label struct {
 
 var staticLabels = []label{
 	label{33, 0, termbox.ColorWhite | termbox.AttrReverse, termbox.ColorDefault, "TelloTerm"},
+	label{33, 14, termbox.ColorWhite | termbox.AttrUnderline, termbox.ColorDefault, "MVO Data"},
+	label{33, 17, termbox.ColorWhite | termbox.AttrUnderline, termbox.ColorDefault, "IMU Data"},
 }
 
 type field struct {
@@ -113,61 +115,57 @@ var fieldsMu sync.RWMutex
 var fields [fNumFields]field
 
 func setupFields() {
-	fields[fHeight] = field{label{8, 2, termbox.ColorWhite, termbox.ColorDefault, "Height: "}, 16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"}
-	fields[fBattery] = field{label{33, 2, termbox.ColorWhite, termbox.ColorDefault, "Battery: "}, 42, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
-	fields[fWifiStrength] = field{label{60, 2, termbox.ColorWhite, termbox.ColorDefault, "WiFi: "}, 66, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
+	fields[fHeight] = field{label{8, 2, termbox.ColorWhite, termbox.ColorDefault, "Height: "}, 16, 2, 5, termbox.ColorWhite, termbox.ColorDefault, "?m"}
+	fields[fBattery] = field{label{34, 2, termbox.ColorWhite, termbox.ColorDefault, "Battery: "}, 43, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "?%"}
+	fields[fWifiStrength] = field{label{61, 2, termbox.ColorWhite, termbox.ColorDefault, "WiFi: "}, 67, 2, 4, termbox.ColorWhite, termbox.ColorDefault, "?%"}
 
-	fields[fMaxHeight] = field{label{4, 4, termbox.ColorWhite, termbox.ColorDefault, "Max Height: "}, 16, 4, 5, termbox.ColorWhite, termbox.ColorDefault, "0.0m"}
-	fields[fLowBattThresh] = field{label{23, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "}, 42, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
-	fields[fWifiInterference] = field{label{52, 4, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 66, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "100%"}
+	fields[fMaxHeight] = field{label{4, 3, termbox.ColorWhite, termbox.ColorDefault, "Max Height: "}, 16, 3, 5, termbox.ColorWhite, termbox.ColorDefault, "?m"}
+	fields[fDroneBattLeft] = field{label{34, 3, termbox.ColorWhite, termbox.ColorDefault, "Voltage: "}, 43, 3, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fWifiInterference] = field{label{53, 3, termbox.ColorWhite, termbox.ColorDefault, "Interference: "}, 67, 3, 4, termbox.ColorWhite, termbox.ColorDefault, "?%"}
 
-	fields[fDerivedSpeed] = field{label{27, 6, termbox.ColorYellow, termbox.ColorDefault, "Derived Speed: "}, 42, 6, 7, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
-	fields[fVertSpeed] = field{label{50, 6, termbox.ColorWhite, termbox.ColorDefault, "Vertical Speed: "}, 66, 6, 7, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fLowBattThresh] = field{label{24, 4, termbox.ColorWhite, termbox.ColorDefault, "Lo Batt Threshold: "}, 43, 4, 4, termbox.ColorWhite, termbox.ColorDefault, "?%"}
 
-	fields[fGroundSpeed] = field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
-	fields[fFwdSpeed] = field{label{27, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 42, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
-	fields[fLatSpeed] = field{label{51, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "}, 66, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "0m/s"}
+	fields[fDerivedSpeed] = field{label{28, 6, termbox.ColorYellow, termbox.ColorDefault, "Derived Speed: "}, 43, 6, 7, termbox.ColorWhite, termbox.ColorDefault, "?m/s"}
+	fields[fVertSpeed] = field{label{51, 6, termbox.ColorWhite, termbox.ColorDefault, "Vertical Speed: "}, 67, 6, 7, termbox.ColorWhite, termbox.ColorDefault, "?m/s"}
 
-	fields[fBattLow] = field{label{3, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Low: "}, 16, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
-	fields[fBattCrit] = field{label{24, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Critical: "}, 42, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
-	fields[fBattState] = field{label{51, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State: "}, 66, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fGroundSpeed] = field{label{2, 7, termbox.ColorWhite, termbox.ColorDefault, "Ground Speed: "}, 16, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "?m/s"}
+	fields[fFwdSpeed] = field{label{28, 7, termbox.ColorWhite, termbox.ColorDefault, "Forward Speed: "}, 43, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "?m/s"}
+	fields[fLatSpeed] = field{label{52, 7, termbox.ColorWhite, termbox.ColorDefault, "Lateral Speed: "}, 67, 7, 5, termbox.ColorWhite, termbox.ColorDefault, "?m/s"}
 
-	fields[fGroundVis] = field{label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual: "}, 16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
-	fields[fOvertemp] = field{label{24, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature: "}, 42, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
-	fields[fLightStrength] = field{label{50, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength: "}, 66, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "0"}
+	fields[fBattLow] = field{label{3, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Low: "}, 16, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fBattCrit] = field{label{25, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery Critical: "}, 43, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fBattState] = field{label{52, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State: "}, 67, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fOnGround] = field{label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground: "}, 16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
-	fields[fHovering] = field{label{32, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "}, 42, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
-	fields[fFlying] = field{label{58, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "}, 66, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "N"}
+	fields[fGroundVis] = field{label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual: "}, 16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fOvertemp] = field{label{25, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature: "}, 43, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fLightStrength] = field{label{51, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength: "}, 67, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fFlyMode] = field{label{29, 12, termbox.ColorWhite, termbox.ColorDefault, "Flight Mode: "}, 42, 12, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fOnGround] = field{label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground: "}, 16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fHovering] = field{label{33, 11, termbox.ColorWhite, termbox.ColorDefault, "Hovering: "}, 43, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fFlying] = field{label{59, 11, termbox.ColorWhite, termbox.ColorDefault, "Flying: "}, 67, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fCameraState] = field{label{2, 13, termbox.ColorWhite, termbox.ColorDefault, "Camera State:"}, 16, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fDroneFlyTimeLeft] = field{label{24, 13, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining:"}, 42, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fDroneBattLeft] = field{label{49, 13, termbox.ColorWhite, termbox.ColorDefault, "Battery Voltage:"}, 66, 13, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fCameraState] = field{label{2, 12, termbox.ColorWhite, termbox.ColorDefault, "Camera State: "}, 16, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fFlyMode] = field{label{30, 12, termbox.ColorWhite, termbox.ColorDefault, "Flight Mode: "}, 43, 12, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fDroneFlyTimeLeft] = field{label{49, 12, termbox.ColorWhite, termbox.ColorDefault, "Flight Remaining: "}, 67, 12, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fVelX] = field{label{4, 16, termbox.ColorWhite, termbox.ColorDefault, "X Velocity:"}, 16, 16, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fVelY] = field{label{30, 16, termbox.ColorWhite, termbox.ColorDefault, "Y Velocity:"}, 42, 16, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fVelZ] = field{label{54, 16, termbox.ColorWhite, termbox.ColorDefault, "Z Velocity:"}, 66, 16, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelX] = field{label{4, 15, termbox.ColorWhite, termbox.ColorDefault, "X Velocity:"}, 16, 15, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelY] = field{label{31, 15, termbox.ColorWhite, termbox.ColorDefault, "Y Velocity:"}, 43, 15, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVelZ] = field{label{55, 15, termbox.ColorWhite, termbox.ColorDefault, "Z Velocity:"}, 67, 15, 8, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fPosX] = field{label{4, 17, termbox.ColorWhite, termbox.ColorDefault, "X Position:"}, 16, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fPosY] = field{label{30, 17, termbox.ColorWhite, termbox.ColorDefault, "Y Position:"}, 42, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fPosZ] = field{label{54, 17, termbox.ColorWhite, termbox.ColorDefault, "Z Position:"}, 66, 17, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fPosX] = field{label{4, 16, termbox.ColorWhite, termbox.ColorDefault, "X Position:"}, 16, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fPosY] = field{label{31, 16, termbox.ColorWhite, termbox.ColorDefault, "Y Position:"}, 43, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fPosZ] = field{label{55, 16, termbox.ColorWhite, termbox.ColorDefault, "Z Position:"}, 67, 16, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fQatX] = field{label{4, 18, termbox.ColorWhite, termbox.ColorDefault, "X Quat:"}, 16, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fQatY] = field{label{30, 18, termbox.ColorWhite, termbox.ColorDefault, "Y Quat:"}, 42, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fQatZ] = field{label{54, 18, termbox.ColorWhite, termbox.ColorDefault, "Z Quat:"}, 66, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatX] = field{label{8, 18, termbox.ColorWhite, termbox.ColorDefault, "X Quat:"}, 16, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatY] = field{label{35, 18, termbox.ColorWhite, termbox.ColorDefault, "Y Quat:"}, 43, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatZ] = field{label{59, 18, termbox.ColorWhite, termbox.ColorDefault, "Z Quat:"}, 67, 18, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
-	fields[fTemp] = field{label{4, 19, termbox.ColorWhite, termbox.ColorDefault, "Temp:"}, 16, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fQatW] = field{label{30, 19, termbox.ColorWhite, termbox.ColorDefault, "W Quat:"}, 42, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fYaw] = field{label{54, 19, termbox.ColorWhite, termbox.ColorDefault, "Yaw:"}, 66, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-
-	// fields[fRoll] = field{label{4, 20, termbox.ColorWhite, termbox.ColorDefault, "Roll:"}, 16, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	// fields[fPitch] = field{label{30, 20, termbox.ColorWhite, termbox.ColorDefault, "Pitch:"}, 42, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	// fields[fYaw] = field{label{54, 20, termbox.ColorWhite, termbox.ColorDefault, "Yaw:"}, 66, 20, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fTemp] = field{label{10, 19, termbox.ColorWhite, termbox.ColorDefault, "Temp:"}, 16, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fQatW] = field{label{35, 19, termbox.ColorWhite, termbox.ColorDefault, "W Quat:"}, 43, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fYaw] = field{label{62, 19, termbox.ColorYellow, termbox.ColorDefault, "Yaw:"}, 67, 19, 6, termbox.ColorWhite, termbox.ColorDefault, "?°"}
 
 	fields[fSSID] = field{label{10, 22, termbox.ColorWhite, termbox.ColorDefault, "SSID: "}, 16, 22, 20, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fVersion] = field{label{56, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 66, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fVersion] = field{label{57, 22, termbox.ColorWhite, termbox.ColorDefault, "Firmware: "}, 67, 22, 10, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 }
 
@@ -491,7 +489,7 @@ func updateFields(newFd tello.FlightData) {
 	// p, r, y := tello.QuatToEulerDeg(newFd.IMU.QuaternionX, newFd.IMU.QuaternionY, newFd.IMU.QuaternionZ, newFd.IMU.QuaternionW)
 	// fields[fRoll].value = fmt.Sprintf("%d", r)
 	// fields[fPitch].value = fmt.Sprintf("%d", p)
-	fields[fYaw].value = fmt.Sprintf("%d", newFd.IMU.Yaw)
+	fields[fYaw].value = fmt.Sprintf("%d°", newFd.IMU.Yaw)
 
 	fields[fSSID].value = newFd.SSID
 	fields[fVersion].value = newFd.Version
