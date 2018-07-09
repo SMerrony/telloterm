@@ -17,3 +17,4 @@ telloterm
 *.csv
 *.gnuneric
 
+.vscode/settings.json
