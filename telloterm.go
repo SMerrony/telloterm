@@ -502,9 +502,9 @@ func updateFields(newFd tello.FlightData) {
 	fields[fYaw].value = fmt.Sprintf("%d°", newFd.IMU.Yaw)
 
 	if drone.IsHomeSet() {
-		fields[fHome].value = "Unset"
-	} else {
 		fields[fHome].value = "Set"
+	} else {
+		fields[fHome].value = "Unset"
 	}
 
 	fields[fSSID].value = newFd.SSID
