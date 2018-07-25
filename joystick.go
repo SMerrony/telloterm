@@ -175,10 +175,30 @@ func readJoystick(test bool) {
 			log.Printf("Error reading joystick: %v\n", err)
 		}
 
-		sm.Lx = int16(jsState.AxisData[jsConfig.axes[axLeftX]])
-		sm.Ly = int16(jsState.AxisData[jsConfig.axes[axLeftY]]) * -1
-		sm.Rx = int16(jsState.AxisData[jsConfig.axes[axRightX]])
-		sm.Ry = int16(jsState.AxisData[jsConfig.axes[axRightY]]) * -1
+		if jsState.AxisData[jsConfig.axes[axLeftX]] == 32768 {
+			sm.Lx = 32767
+		} else {
+			sm.Lx = int16(jsState.AxisData[jsConfig.axes[axLeftX]])
+		}
+
+		if jsState.AxisData[jsConfig.axes[axLeftY]] == 32768 {
+			sm.Ly = -32767
+		} else {
+			sm.Ly = -int16(jsState.AxisData[jsConfig.axes[axLeftY]])
+		}
+
+		if jsState.AxisData[jsConfig.axes[axRightX]] == 32768 {
+			sm.Rx = 32767
+		} else {
+			sm.Rx = int16(jsState.AxisData[jsConfig.axes[axRightX]])
+		}
+
+		if jsState.AxisData[jsConfig.axes[axRightY]] == 32768 {
+			sm.Ry = -32767
+		} else {
+			sm.Ry = -int16(jsState.AxisData[jsConfig.axes[axRightY]])
+		}
+
 		if intAbs(sm.Lx) < deadZone {
 			sm.Lx = 0
 		}
