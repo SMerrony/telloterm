@@ -83,7 +83,7 @@ const (
 	fBattCrit
 	fBattState
 	fGroundVis
-	fOvertemp
+	fErrorState
 	fLightStrength
 	fOnGround
 	fHovering
@@ -138,7 +138,7 @@ func setupFields() {
 	fields[fBattState] = field{label{52, 9, termbox.ColorWhite, termbox.ColorDefault, "Battery State:"}, 67, 9, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fGroundVis] = field{label{1, 10, termbox.ColorWhite, termbox.ColorDefault, "Ground Visual:"}, 16, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
-	fields[fOvertemp] = field{label{25, 10, termbox.ColorWhite, termbox.ColorDefault, "Over Temperature:"}, 43, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
+	fields[fErrorState] = field{label{26, 10, termbox.ColorWhite, termbox.ColorDefault, "Error Condition:"}, 43, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
 	fields[fLightStrength] = field{label{51, 10, termbox.ColorWhite, termbox.ColorDefault, "Light Strength:"}, 67, 10, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
 
 	fields[fOnGround] = field{label{5, 11, termbox.ColorWhite, termbox.ColorDefault, "On Ground:"}, 16, 11, 5, termbox.ColorWhite, termbox.ColorDefault, "?"}
@@ -469,7 +469,7 @@ func updateFields(newFd tello.FlightData) {
 	fields[fBattState].value = boolToYN(newFd.BatteryState)
 
 	fields[fGroundVis].value = boolToYN(newFd.DownVisualState)
-	fields[fOvertemp].value = boolToYN(newFd.OverTemp)
+	fields[fErrorState].value = boolToYN(newFd.ErrorState)
 	fields[fLightStrength].value = fmt.Sprintf("%d", newFd.LightStrength)
 
 	fields[fOnGround].value = boolToYN(newFd.OnGround)
@@ -544,10 +544,10 @@ func startVideo() {
 	}
 
 	// start video feed when drone connects
-	drone.StartVideo()
+	drone.GetVideoSpsPps()
 	go func() {
 		for {
-			drone.StartVideo()
+			drone.GetVideoSpsPps()
 			time.Sleep(500 * time.Millisecond)
 		}
 	}()
