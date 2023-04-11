@@ -18,7 +18,14 @@ Only tested on GNU/Linux - it wil probably work OK on Macs, but it will take som
 
 ## Install
 
-``go get github.com/SMerrony/telloterm``
+~~``go get github.com/SMerrony/telloterm``~~
+Updated 2023...
+
+```
+go mod init telloterm
+go mod tidy
+go build
+```
 
 If you wish to use the video window you must have mplayer installed and on your PATH.
 
